@@ -1,0 +1,3 @@
+[submodule "dist-upgrader"]
+	path = dist-upgrader
+	url = https://github.com/plesk/dist-upgrader.git

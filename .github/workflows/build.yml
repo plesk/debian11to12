@@ -1,0 +1,28 @@
+name: Build with Buck
+
+on: [push]
+
+jobs:
+  build:
+    # Not latest, because python3.6 is not available on latest
+    # (https://github.com/actions/setup-python/issues/544),
+    # and SandakovMM/build-with-buck@v2 action requires it
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Prepare artifact store
+      run: mkdir -p ./buck-out/gen
+    - name: Build debian11to12
+      id: build
+      uses: SandakovMM/build-with-buck@v2
+      with:
+        command: build
+        target: :debian11to12
+    - name: Store result
+      uses: actions/upload-artifact@v3
+      with:
+        name: debian11to12
+        path: ./buck-out/gen/debian11to12

@@ -1,0 +1,28 @@
+# Copyright 1999-2023. Plesk International GmbH. All rights reserved.
+# vim:ft=python:
+
+include_defs('//product.defs.py')
+
+
+genrule(
+    name = 'config',
+    srcs = ['config.py'],
+    out = 'config.py',
+    bash = '''\
+        DEB11TO12_VERSION='{version}'
+        DEB11TO12_REVISION='{revision}'
+        sed -e "s/@@DEB11TO12_VERSION@@/$DEB11TO12_VERSION/g; s/@@DEB11TO12_REVISION@@/$DEB11TO12_REVISION/g" "$SRCS" >"$OUT"
+    '''.format(
+        version=get_deb11to12_version(),
+        revision=get_deb11to12_revision(),
+    ),
+)
+
+python_library(
+    name = 'lib',
+    srcs = glob(
+        ['**/*.py'],
+        exclude = ['config.py'],
+    ) + [':config'],
+    visibility = ['PUBLIC'],
+)
