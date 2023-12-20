@@ -17,7 +17,7 @@ jobs:
       run: mkdir -p ./buck-out/gen
     - name: Build debian11to12
       id: build
-      uses: SandakovMM/build-with-buck@v2
+      uses: SandakovMM/build-with-buck@v3
       with:
         command: build
         target: :debian11to12
