@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout repository and submodules
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: recursive
+        fetch-tags: true
     - name: Prepare artifact store
       run: mkdir -p ./buck-out/gen
     - name: Build debian11to12
