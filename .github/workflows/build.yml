@@ -13,8 +13,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+        # We use tags to determine version, so fetch them
         fetch-depth: 0
         fetch-tags: true
+    # Workaround for https://github.com/actions/checkout/issues/882
+    - name: Explicitly fetch tags
+      run: git fetch --force --tags
     - name: Prepare artifact store
       run: mkdir -p ./buck-out/gen
     - name: Build debian11to12
