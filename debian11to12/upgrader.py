@@ -137,6 +137,7 @@ class Debian11to12Upgrader(DistUpgrader):
             actions.AssertMinPhpVersion("7.4"),
             actions.AssertDpkgNotLocked(),
             actions.AssertNotInContainer(),
+            actions.AssertGrubInstallDeviceExists(),
         ]
 
     def parse_args(self, args: typing.Sequence[str]) -> None:
