@@ -7,26 +7,21 @@ import typing
 from pleskdistup import actions
 from pleskdistup.common import action, feedback
 from pleskdistup.phase import Phase
-from pleskdistup.upgrader import DistUpgrader, DistUpgraderFactory, PathType, SystemDescription
+from pleskdistup.upgrader import dist, DistUpgrader, DistUpgraderFactory, PathType
 
 import debian11to12.config
 
 
 class Debian11to12Upgrader(DistUpgrader):
-    _os_from_name = "Debian"
-    _os_from_version = "11"
-    _os_to_name = "Debian"
-    _os_to_version = "12"
+    _distro_from = dist.Debian("11")
+    _distro_to = dist.Debian("12")
+
 
     def __init__(self):
         super().__init__()
 
     def __repr__(self) -> str:
-        attrs = ", ".join(f"{k}={getattr(self, k)!r}" for k in (
-            "_os_from_name", "_os_from_version",
-            "_os_to_name", "_os_to_version",
-        ))
-        return f"{self.__class__.__name__}({attrs})"
+        return f"{self.__class__.__name__}(From {self._distro_from}, To {self._distro_to})"
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}"
@@ -34,19 +29,14 @@ class Debian11to12Upgrader(DistUpgrader):
     @classmethod
     def supports(
         cls,
-        from_system: typing.Optional[SystemDescription] = None,
-        to_system: typing.Optional[SystemDescription] = None,
+        from_system: typing.Optional[dist.Distro] = None,
+        to_system: typing.Optional[dist.Distro] = None
     ) -> bool:
-        def matching_system(system: SystemDescription, os_name: str, os_version: str) -> bool:
-            return (
-                (system.os_name is None or system.os_name == os_name)
-                and (system.os_version is None or system.os_version == os_version)
-            )
-
         return (
-            (from_system is None or matching_system(from_system, cls._os_from_name, cls._os_from_version))
-            and (to_system is None or matching_system(to_system, cls._os_to_name, cls._os_to_version))
+            (from_system is None or cls._distro_from == from_system)
+            and (to_system is None or cls._distro_to == to_system)
         )
+
 
     @property
     def upgrader_name(self) -> str:
@@ -78,7 +68,7 @@ class Debian11to12Upgrader(DistUpgrader):
         options: typing.Any,
         phase: Phase
     ) -> typing.Dict[str, typing.List[action.ActiveAction]]:
-        new_os = f"{self._os_to_name} {self._os_to_version}"
+        new_os = f"{self._distro_to}"
         return {
             "Prepare": [
                 actions.HandleConversionStatus(options.status_flag_path, options.completion_flag_path),
@@ -137,10 +127,11 @@ class Debian11to12Upgrader(DistUpgrader):
             actions.AssertMinPhpVersion("7.4"),
             actions.AssertDpkgNotLocked(),
             actions.AssertNotInContainer(),
+            actions.AssertGrubInstallDeviceExists(),
         ]
 
     def parse_args(self, args: typing.Sequence[str]) -> None:
-        DESC_MESSAGE = f"""Use this upgrader to dist-upgrade an {self._os_from_name} {self._os_from_version} server with Plesk to {self._os_to_name} {self._os_to_version}. The process consists of the following general stages:
+        DESC_MESSAGE = f"""Use this upgrader to dist-upgrade an {self._distro_from} server with Plesk to {self._distro_to} The process consists of the following general stages:
 
 -- Preparation (about 5 minutes) - The OS is prepared for the conversion.
 -- Conversion (about 15 minutes) - Plesk and system dist-upgrade is performed.
@@ -179,8 +170,8 @@ class Debian11to12Factory(DistUpgraderFactory):
 
     def supports(
         self,
-        from_system: typing.Optional[SystemDescription] = None,
-        to_system: typing.Optional[SystemDescription] = None
+        from_system: typing.Optional[dist.Distro] = None,
+        to_system: typing.Optional[dist.Distro] = None
     ) -> bool:
         return Debian11to12Upgrader.supports(from_system, to_system)
 
