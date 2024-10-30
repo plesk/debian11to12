@@ -16,7 +16,6 @@ class Debian11to12Upgrader(DistUpgrader):
     _distro_from = dist.Debian("11")
     _distro_to = dist.Debian("12")
 
-
     def __init__(self):
         super().__init__()
 
@@ -36,7 +35,6 @@ class Debian11to12Upgrader(DistUpgrader):
             (from_system is None or cls._distro_from == from_system)
             and (to_system is None or cls._distro_to == to_system)
         )
-
 
     @property
     def upgrader_name(self) -> str:
@@ -68,7 +66,7 @@ class Debian11to12Upgrader(DistUpgrader):
         options: typing.Any,
         phase: Phase
     ) -> typing.Dict[str, typing.List[action.ActiveAction]]:
-        new_os = f"{self._distro_to}"
+        new_os = str(self._distro_to)
         return {
             "Prepare": [
                 actions.HandleConversionStatus(options.status_flag_path, options.completion_flag_path),
@@ -139,7 +137,7 @@ class Debian11to12Upgrader(DistUpgrader):
         ]
 
     def parse_args(self, args: typing.Sequence[str]) -> None:
-        DESC_MESSAGE = f"""Use this upgrader to dist-upgrade an {self._distro_from} server with Plesk to {self._distro_to} The process consists of the following general stages:
+        DESC_MESSAGE = f"""Use this upgrader to dist-upgrade an {self._distro_from} server with Plesk to {self._distro_to}. The process consists of the following general stages:
 
 -- Preparation (about 5 minutes) - The OS is prepared for the conversion.
 -- Conversion (about 15 minutes) - Plesk and system dist-upgrade is performed.
