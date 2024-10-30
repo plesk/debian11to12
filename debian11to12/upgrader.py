@@ -95,7 +95,7 @@ class Debian11to12Upgrader(DistUpgrader):
                     '\g<1>://\g<2>/\g<3>12.7\g<4>',
                 ),
                 actions.ReplaceAptReposRegexp(
-                    r'(http|https)://([^/]+)/(.*\b)11\(\b.*)',
+                    r'(http|https)://([^/]+)/(.*\b)11(\b.*)',
                     '\g<1>://\g<2>/\g<3>12\g<4>',
                 ),
                 actions.SwitchPleskRepositories(to_os_version="12"),
