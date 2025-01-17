@@ -5,7 +5,7 @@ import os
 import typing
 
 from pleskdistup import actions
-from pleskdistup.common import action, feedback
+from pleskdistup.common import action, feedback, strings
 from pleskdistup.phase import Phase
 from pleskdistup.upgrader import dist, DistUpgrader, DistUpgraderFactory, PathType
 
@@ -90,14 +90,11 @@ class Debian11to12Upgrader(DistUpgrader):
                 }),
             ],
             "Switch repositories": [
-                actions.SetupDebianRepositories("bullseye", "bookworm"),
-                actions.ReplaceAptReposRegexp(
-                    r'(http|https)://([^/]+)/(.*\b)11\.11(\b.*)',
-                    '\g<1>://\g<2>/\g<3>12.7\g<4>',
-                ),
-                actions.ReplaceAptReposRegexp(
-                    r'(http|https)://([^/]+)/(.*\b)11(\b.*)',
-                    '\g<1>://\g<2>/\g<3>12\g<4>',
+                actions.AdoptAptRepositoriesUbuntu([
+                    strings.create_replace_string_function('bullseye', 'bookworm'),
+                    strings.create_replace_regexp_function(r'(http|https)://([^/]+)/(.*\b)11\.11(\b.*)', '\g<1>://\g<2>/\g<3>12.7\g<4>'),
+                    strings.create_replace_regexp_function(r'(http|https)://([^/]+)/(.*\b)11(\b.*)', '\g<1>://\g<2>/\g<3>12\g<4>'),
+                    ], name="modify apt repositories to new OS"
                 ),
                 actions.SwitchPleskRepositories(to_os_version="12"),
             ],
