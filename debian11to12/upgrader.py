@@ -94,8 +94,8 @@ class Debian11to12Upgrader(DistUpgrader):
             "Switch repositories": [
                 actions.AdoptAptRepositoriesUbuntu([
                     strings.create_replace_string_function('bullseye', 'bookworm'),
-                    strings.create_replace_regexp_function(r'(http|https)://([^/]+)/(.*\b)11\.11(\b.*)', '\g<1>://\g<2>/\g<3>12.7\g<4>'),
-                    strings.create_replace_regexp_function(r'(http|https)://([^/]+)/(.*\b)11(\b.*)', '\g<1>://\g<2>/\g<3>12\g<4>'),
+                    strings.create_replace_regexp_function(r'(http|https)://([^/]+)/(\b.*)(debian|debian-testing)/11\.11(\b.*)', '\g<1>://\g<2>/\g<3>\g<4>/12.7\g<5>'),
+                    strings.create_replace_regexp_function(r'(http|https)://([^/]+)/(\b.*)(debian|debian-testing)/11(\b.*)', '\g<1>://\g<2>/\g<3>\g<4>/12\g<5>'),
                     ], name="modify apt repositories to new OS"
                 ),
                 actions.SwitchPleskRepositories(to_os_version="12"),
