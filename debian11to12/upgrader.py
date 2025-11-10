@@ -75,11 +75,11 @@ class Debian11to12Upgrader(DistUpgrader):
                 actions.HandleConversionStatus(options.status_flag_path, options.completion_flag_path),
                 actions.AddFinishSshLoginMessage(new_os),  # Executed at the finish phase only
                 actions.AddInProgressSshLoginMessage(new_os),
+                actions.AddUpgradeSystemdService(os.path.abspath(upgrader_bin_path), options),
                 actions.DisablePleskSshBanner(),
                 actions.RepairPleskInstallation(),  # Executed at the finish phase only
                 actions.UpgradePackages(allow_downgrade=self.downgrade_allowed),
                 actions.UpdatePlesk(),
-                actions.AddUpgradeSystemdService(os.path.abspath(upgrader_bin_path), options),
                 actions.ConfigureMariadb({
                     "mysqld.bind-address": {
                         "prepare": actions.ConfigValueReplacer(new_value="127.0.0.1", old_value="::ffff:127.0.0.1"),
