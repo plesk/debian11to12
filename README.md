@@ -18,6 +18,41 @@ To avoid downtime and data loss, make sure you have read and understood the foll
 The conversion process should run between 20 and 30 minutes. **Plesk services, hosted websites, and e-mails will be unavailable during the entirety of the conversion process**.
 
 ## Known issues
+### False GRUB installation-device failure with multiple disks (v1.0.7)
+
+Version 1.0.7 can stop during preparation with an error such as:
+
+```text
+Required pre-conversion condition 'check GRUB installation device exists' not met:
+        Grub's install-device is not found: /dev/sda, /dev/sdb
+```
+
+This can happen even when both disks exist, for example on a BIOS system with
+software RAID1. The check reads `grub-pc/install_devices` from `debconf-show`
+and incorrectly treats the comma-separated list as one filesystem path.
+
+The fix checks each configured device separately and still rejects missing
+devices or an empty device list. It has been merged in
+[dist-upgrader#184](https://github.com/plesk/dist-upgrader/pull/184) and included
+in this repository by [#33](https://github.com/plesk/debian11to12/pull/33), but
+is not included in the v1.0.7 release archive linked below. Use a release or
+build containing #33 to obtain the corrected check.
+
+To distinguish this false positive from a missing disk, inspect the system
+without starting conversion:
+
+```shell
+debconf-show grub-pc
+lsblk -o NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT
+```
+
+The suggested `dpkg --configure grub-pc` command does not reconfigure an already
+configured package and cannot repair this parsing bug. Do not remove a valid
+GRUB installation target or bypass the check merely to pass preparation.
+If a configured device really is missing, investigate and correct the boot
+configuration before upgrading. Passing this check alone does not verify
+that every disk is bootable.
+
 ### Blockers
 Do not use the utility if any of the following is true:
 - **Your system is in a container (like Virtuozzo containers, Docker Containers, etc).**
